@@ -29,7 +29,11 @@ export default function Index() {
 
   // functions
   const validateFields = () => {
-    return email !== "" && pswd !== "" && fname !== "" && lname !== "";
+    if (isLogin) {
+      return email && pswd;
+    } else {
+      return fname && lname && email && pswd;
+    }
   };
 
   const handleSubmit = () => {
