@@ -11,9 +11,7 @@ import {
 } from "react-native";
 import { useState } from "react";
 
-
 export default function Index() {
-
   // variables
   const [fname, setFname] = useState("");
   const [lname, setLname] = useState("");
@@ -21,66 +19,118 @@ export default function Index() {
   const [pswd, setPswd] = useState("");
 
   const [message, setMessage] = useState("");
+  const [isLogin, setIsLogin] = useState(false);
+
+  const MESSAGES = {
+    FILL_FIELDS: "Please fill out all fields.",
+    LOGIN_SUCCESS: "Login successful!",
+    SIGNUP_SUCCESS: "Sign Up successful!",
+  };
 
   // functions
-  const handlePress = () => {
-    // Close keyboard
+  const validateFields = () => {
+    return email !== "" && pswd !== "" && fname !== "" && lname !== "";
+  };
+
+  const handleSubmit = () => {
+    // close keyboard
     Keyboard.dismiss();
 
-    // Validate
-    if (email === "" || pswd === "" || fname === "" || lname === "") {
-      setMessage("please fill out all fields.");
+    // validate
+    if (!validateFields()) {
+      setMessage(MESSAGES.FILL_FIELDS);
       return;
     }
+    // set message
+    setMessage(isLogin ? MESSAGES.LOGIN_SUCCESS : MESSAGES.SIGNUP_SUCCESS);
+  };
 
-    setMessage("Registration Successful!");
+  const handleSwitch = () => {
+    setMessage(""); // clear message
+
+    // clear fields
+    setEmail("");
+    setPswd("");
+    setFname("");
+    setLname("");
+
+    setIsLogin(!isLogin); // switch between login and sign up
   };
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* Title */}
+      {isLogin ? (
+        <Text style={styles.paragraph}>Login</Text>
+      ) : (
+        <Text style={styles.paragraph}>Sign Up</Text>
+      )}
+
+      {/* Inputs */}
+      {/* Hide first name and last name if login */}
+      {!isLogin && (
+        <>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => setFname(text)}
+              value={fname}
+              autoCapitalize={"words"}
+              placeholder="Enter your first name"
+            />
+          </KeyboardAvoidingView>
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <TextInput
+              style={styles.input}
+              onChangeText={(text) => setLname(text)}
+              value={lname}
+              autoCapitalize={"words"}
+              placeholder="Enter your last name"
+            />
+          </KeyboardAvoidingView>
+        </>
+      )}
+
+      {/* Email and password */}
       <KeyboardAvoidingView
         behavior={Platform.OS === "ios" ? "padding" : "height"}
       >
-        <Text style={styles.paragraph}>Sign Up</Text>
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => setFname(text)}
-          value={fname}
-          autoCapitalize={"words"}
-          placeholder="Enter your first name"
-        />
-        <TextInput
-          style={styles.input}
-          onChangeText={(text) => setLname(text)}
-          value={lname}
-          autoCapitalize={"words"}
-          placeholder="Enter your last name"
-        />
         <TextInput
           style={styles.input}
           onChangeText={(text) => setEmail(text)}
           value={email}
           autoCapitalize={"none"}
-          placeholder="Enter your email adress"
-          />
+          placeholder="Enter your email address"
+        />
+      </KeyboardAvoidingView>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+      >
         <TextInput
           style={styles.input}
           onChangeText={(text) => setPswd(text)}
           value={pswd}
           autoCapitalize={"none"}
           placeholder="Enter your password"
-          />
-
-        {/* message */}
-        {message && <Text style={styles.paragraph}>{message}</Text>}
-        
-        <View style={styles.button}>
-          <Button title="Sign up" onPress={handlePress} />
-          <View style={{ marginVertical: 10 }} />
-          <Button title="Switch to login" onPress={handlePress} />
-        </View>
+        />
       </KeyboardAvoidingView>
 
+      {/* message */}
+      {message && <Text style={styles.paragraph}>{message}</Text>}
+
+      {/* Buttons */}
+      <View style={styles.button}>
+        <Button title={isLogin ? "Login" : "Sign Up"} onPress={handleSubmit} />
+        <View style={{ marginVertical: 10 }} />
+        <Button
+          title={isLogin ? "Switch to Sign Up" : "Switch to Login"}
+          onPress={handleSwitch}
+        />
+      </View>
     </SafeAreaView>
   );
 }
